@@ -1,0 +1,323 @@
+# This is a file.
+
+Let's Go!
+
+Damjan Znidarsic
+D.Labs
+@spinx
+
+* 
+
+.image techtalk/no-idea.jpg
+
+* Background
+
+.image http://1.bp.blogspot.com/-QhOR7RQusTg/U3rpCXM5DdI/AAAAAAAAC5Y/JQbHjN0uFg0/s1600/gopher.jpg
+
+* The Go programming language
+
+- Project starts at Google in 2007 (by Griesemer, Pike, Thompson)
+- Open source release in November 2009
+- Version 1.0 release in March 2012
+- Version 1.4 release in December 2014
+- Modern, Compact, concise, general-purpose
+- Imperative, statically type-checked, dynamically type-safe
+- Garbage-collected
+- Compiles to native code, (almost) any platform
+- Fast compilation, efficient execution
+- Almost as fast as C
+
+.link https://golang.org/doc/go1compat Promise of compatibility
+
+# Go was originally built by a team at Google, led by Robert Griesemer, Rob Pike, and Ken Thompson. In November 2010, Go was launched publically as an open source project. Since then, a team at Google and more than 250 contributors from the open source community continued to improve the Go language, libraries, and tools.
+
+# In March 2012, we announced Go 1, a version of the language and libraries that will be supported for years to come. 
+
+* Getting started
+
+* Install Go
+
+  brew install go 
+or
+
+  http://golang.org/doc/install
+
+
+* Hello, World!
+
+.play techtalk/hello.go
+  
+  go run main.go
+
+# Unicode
+# Programs are organized in packages
+# A package is a set of package files
+# A package file expresses its dependencies on other packages via import declarations
+# The remainder of a package file is a list of (constant, variable, type, and function) declarations
+
+* Hello, World! Internet-style
+
+.play techtalk/hellohttp.go
+
+
+* Types
+
+- Predeclared types, the usual suspects:
+  uint8 (byte), uint16, uint32, uint32, uint64,
+  int8, int16, int32, int32 (rune), int64,
+  float32, float64,
+  complex64, complex128,
+  uint, int, uintptr,
+  bool, string,
+  error  // not so usual
+
+- Composite types:
+  array, struct, pointer, function,
+  slice, map, channel
+
+- Abstract type:
+  interface
+
+
+
+* Type declarations
+
+- Composition from left-to-right (Pascal style):
+  [10]byte  // array of 10 bytes
+
+  struct {
+    name        string
+    left, right *Node
+    action      func(*Node)
+  }
+
+  func(a, b, c int)
+  func(http.ResponseWriter, *http.Request) error
+
+- A type declaration defines a _new_ type:
+  type Weekday int
+
+  type Point struct {
+    x, y int
+  }
+
+
+* Slices
+
+  []T  // slice of T
+
+- Descriptor for an underlying array segment
+- May grow and shrink
+- Has length and capacity
+- Assigning a slice copies the descriptor, not the underlying array
+- Slices play the role of dynamically sized arrays
+- Widely used in Go code
+
+
+* Maps
+
+  map[K]V  // map K -> V
+
+- Map is a language-supplied hash table
+- Maps values of key type K to values of type V
+
+* Statements and control structures
+
+- Curly braces (C style)
+- Multiple assignments and some other new constructs
+- Many cleanups: mandatory braces, no parentheses for conditionals, implicit break in switches, no semicolons, etc.
+  a, b = b, a                 // swap
+  f, err = os.Open(filename)
+
+  if x < y {
+    return x
+  } else {
+    return y
+  }
+
+  switch day {
+  case Mon:
+    ...
+    // break is implicit
+  case Tue, Wed:
+    ...
+  }
+
+* Statements and control structures
+- infinite loop
+  for { }
+
+- for loop
+  for i := 0; i < 10; i++ {
+      fmt.Println(i)
+  }
+- looping through a map
+  for key, value := range oldMap {
+      newMap[key] = value
+  }
+- while loop
+  sum := 1
+  for sum < 10 {
+    sum += sum
+  }
+
+
+* A few words on syntax
+
+  go fmt
+
+- Formats the source code
+- Every time you save a file
+- Only one way to do a thing
+
+* Functions
+
+- Regular functions
+  func Sin(x float64) float64
+  func AddScale(x, y int, f float64) int
+
+- Multiple return values
+  func Write(data []byte) (written int, err error)
+
+- Variadic parameter lists without magic
+  func Printf(format string, args ...interface{})
+
+* Methods
+
+Methods are functions with a _receiver_ parameter:
+
+.code techtalk/box.go /String START/,/String END/
+
+The receiver binds the method to its _base_type_ (Box):
+
+.code techtalk/box.go /Box START/,/Box END/
+
+Methods are invoked via the usual dot notation:
+
+.play techtalk/box.go /main START/,/main END/
+
+Methods can be defined for any user-defined type!
+
+
+* Interface types
+
+- Abstract
+- Define (possibly empty) set of method signatures
+- Values of _any_type_ that implement all methods of an interface can be assigned to a variable of that interface.
+
+Examples:
+
+  interface{}  // empty interface
+
+  interface {
+    String() string
+  }
+
+  interface {
+    Len() int
+    Swap(i, j int)
+    Less(i, j int) bool
+  }
+
+
+* Using interfaces
+
+.code techtalk/box_stringer.go /Box START/,/Box END/
+
+.code techtalk/stringer.go /Stringer START/,/Stringer END/
+.play techtalk/stringer.go /main START/,/main END/
+
+
+* Using interfaces
+.code techtalk/box_stringer.go /String START/,/String END/
+.play techtalk/box_stringer.go /main START/,/main END/
+
+* Using interfaces
+.play techtalk/box_stringer_sort.go /main START/,/main END/
+
+
+* Concurrency
+
+* Goroutines
+
+- The _go_ statement launches a function call as a goroutine
+  go f()
+  go f(x, y, ...)
+
+- A goroutine runs concurrently (but not necessarily in parallel)
+- A goroutine has its own stack
+- Think of it as a tiny thread
+- You can launch millions of them
+
+
+* A simple example
+
+.code techtalk/concurrency1.go /f START/,/f END/
+
+Function f is launched as 3 different goroutines, all running concurrently:
+
+.play techtalk/concurrency1.go /main START/,/main END/
+
+
+* Communication via channels
+
+A channel type specifies a channel value type (and possibly a communication direction):
+
+  chan int
+  chan<- string  // send-only channel
+  <-chan T       // receive-only channel
+
+A channel is a variable of channel type:
+
+  var ch chan int
+  ch := make(chan int)  // declare and initialize with newly made channel
+
+A channel permits _sending_ and _receiving_ values:
+
+  ch <- 1   // send value 1 on channel ch
+  x = <-ch  // receive a value from channel ch (and assign to x)
+
+Channel operations synchronize the communicating goroutines.
+
+* Communicating goroutines
+
+Each goroutine sends its results via channel ch:
+
+.code techtalk/concurrency2.go /f START/,/f END/
+
+The main goroutine receives (and prints) all results from the same channel:
+
+.play techtalk/concurrency2.go /main START/,/main END/
+
+* Search example
+
+.code techtalk/search.go /GSR START/,/GSR END/
+.play techtalk/search.go /START1 START/,/START1 END/
+
+* Search example
+
+
+
+.play techtalk/search2.go /START1 START/,/START1 END/
+
+* Simple Image Server
+
+
+
+* Where to go from here
+
+Learn Go:
+
+.link http://tour.golang.org 
+
+Documentation and articles:
+
+.link http://golang.org/doc
+
+Standard library reference:
+
+.link http://golang.org/pkg
+
+Standard library reference:
+
+.link https://gobyexample.com
